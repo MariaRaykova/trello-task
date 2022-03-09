@@ -21,18 +21,21 @@ const AddStyles = styled.button`
   background: #d4d4d4;
 `;
 
-const Column = ({ tasks, column, columnTasks }) => {
+const Column = ({ tasks, column, columnTasks, parentCallback }) => {
   const [newColumnTasks, setNewColumnTasks] = useState([]);
   const [show, setShow] = useState(false);
+
   useEffect(() => {
     setNewColumnTasks(columnTasks);
   }, [columnTasks]);
+
   const showModal = () => {
     setShow(true);
   };
   const closeModal = () => {
     setShow(false);
   };
+
   const onSubmit = (e) => {
     e.preventDefault(e);
     const newTask = {
@@ -45,6 +48,7 @@ const Column = ({ tasks, column, columnTasks }) => {
     listCopy[column] = newCol;
     localStorage.setItem("tasks", JSON.stringify(listCopy));
     setNewColumnTasks(newCol);
+    parentCallback(JSON.parse(localStorage.getItem("tasks")));
     setShow(false);
   };
 
@@ -54,21 +58,21 @@ const Column = ({ tasks, column, columnTasks }) => {
       <Droppable droppableId={`${column}`}>
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
-            {newColumnTasks?.map((item, index) => (
-              <div>
-                <ListItem key={item?.id} item={item} index={index} />
-              </div>
-            ))}
+            {newColumnTasks.length > 0
+              ? newColumnTasks.map((item, index) => {
+                  return (
+                    <div>
+                      <ListItem key={item?.id} item={item} index={index} />
+                    </div>
+                  );
+                })
+              : null}
             {provided.placeholder}
           </div>
         )}
       </Droppable>
       <AddStyles onClick={showModal}>+ Add another card</AddStyles>
-      {/* <Button variant="secondary" size="sm" onClick={showModal}>
-        Add New Task
-      </Button> */}
       {show ? <ModalBox onSubmit={onSubmit} handleClose={closeModal} /> : null}
-      {/* <button onClick={addTask}>Add Task</button> */}
     </DroppableStyles>
   );
 };

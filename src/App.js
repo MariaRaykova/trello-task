@@ -7,8 +7,7 @@ export default function App() {
   const [elements, setElements] = useState(null);
   useEffect(() => {
     setElements(items);
-  }, []);
-  //localStorage.clear();
+  }, [elements]);
 
   if (elements && !localStorage.getItem("tasks")) {
     localStorage.setItem("tasks", JSON.stringify(elements));

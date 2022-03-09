@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { DragDropContext } from "react-beautiful-dnd";
-import { columns } from "../utils/items";
+import { columns, items } from "../utils/items";
+
 import Column from "./Column";
 
 const DragDropContextContainer = styled.div`
@@ -29,18 +30,23 @@ const addToList = (list, index, element) => {
 
 function Container() {
   const [tasks, setTasks] = useState(null);
-  const storage = JSON.parse(localStorage.getItem("tasks"));
   useEffect(() => {
+    const storage = JSON.parse(localStorage.getItem("tasks"));
     setTasks(storage);
   }, []);
   const resetTasks = () => {
     localStorage.clear();
+    localStorage.setItem("tasks", JSON.stringify(items));
+    const storage = JSON.parse(localStorage.getItem("tasks"));
+    setTasks(storage);
   };
+
   const onDragEnd = (result) => {
     if (!result.destination) {
       return;
     }
     const listCopy = { ...tasks };
+
     const sourceList = listCopy[result.source.droppableId];
     const [removedElement, newSourceList] = removeFromList(
       sourceList,
@@ -56,6 +62,9 @@ function Container() {
     localStorage.setItem("tasks", JSON.stringify(listCopy));
     setTasks(listCopy);
   };
+  const setChanges = (tasks) => {
+    setTasks(tasks);
+  };
 
   return (
     <DragDropContextContainer>
@@ -63,6 +72,7 @@ function Container() {
         <ListGrid>
           {columns.map((columnName) => (
             <Column
+              parentCallback={setChanges}
               tasks={tasks}
               columnTasks={tasks ? tasks[columnName] : []}
               key={columnName}
