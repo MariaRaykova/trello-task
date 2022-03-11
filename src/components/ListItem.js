@@ -1,5 +1,6 @@
 import { Draggable } from "react-beautiful-dnd";
-import React from "react";
+import React, { useState } from "react";
+import ModalBoxEdit from "./ModalEdit";
 import styled from "styled-components";
 import { Badge } from "react-bootstrap";
 
@@ -30,8 +31,23 @@ const DragItem = styled.div`
   grid-gap: 20px;
   flex-direction: column;
 `;
+const EditStyles = styled.button`
+  font-size: 12px;
+  border: none;
+  color: #61dafb;
+  width: 100%;
+`;
 
-const ListItem = ({ item, index }) => {
+const ListItem = ({ item, index, onSubmitEdit }) => {
+  const [showEdit, setShowEdit] = useState(false);
+
+  const showModalEdit = () => {
+    setShowEdit(true);
+  };
+  const closeModalEdit = () => {
+    setShowEdit(false);
+  };
+
   return (
     <Draggable draggableId={item?.id} index={index}>
       {(provided, snapshot) => {
@@ -46,7 +62,15 @@ const ListItem = ({ item, index }) => {
               <Badge pill bg="info">
                 {item?.badge}
               </Badge>
-              {item?.content}
+              <div>{item?.content}</div>
+              <EditStyles onClick={showModalEdit}>Edit</EditStyles>
+              {showEdit ? (
+                <ModalBoxEdit
+                  onSubmitEdit={onSubmitEdit}
+                  handleClose={closeModalEdit}
+                  item={item}
+                />
+              ) : null}
             </div>
             <CardFooter>
               <Author>

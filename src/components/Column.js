@@ -3,9 +3,9 @@ import ListItem from "./ListItem";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import ModalBox from "./Modal";
+import ModalBoxEdit from "./ModalEdit";
 import { v4 as uuidv4 } from "uuid";
 const ColumnHeader = styled.div`
-  text-transform: uppercase;
   margin-bottom: 20px;
 `;
 
@@ -35,6 +35,24 @@ const Column = ({ tasks, column, columnTasks, parentCallback }) => {
   const closeModal = () => {
     setShow(false);
   };
+  const onSubmitEdit = (e) => {
+    e.preventDefault(e);
+    const newTask = {
+      id: e.target.id.value,
+      content: e.target.content.value,
+      badge: e.target.badge.value
+    };
+    const listCopy = { ...tasks };
+    const newArr = [];
+    newColumnTasks.forEach((element) => {
+      element.id === newTask.id ? newArr.push(newTask) : newArr.push(element);
+    });
+    listCopy[column] = newArr;
+    localStorage.setItem("tasks", JSON.stringify(listCopy));
+    setNewColumnTasks(newArr);
+    parentCallback(JSON.parse(localStorage.getItem("tasks")));
+    closeModal(false);
+  };
 
   const onSubmit = (e) => {
     e.preventDefault(e);
@@ -62,7 +80,12 @@ const Column = ({ tasks, column, columnTasks, parentCallback }) => {
               ? newColumnTasks.map((item, index) => {
                   return (
                     <div>
-                      <ListItem key={item?.id} item={item} index={index} />
+                      <ListItem
+                        key={item?.id}
+                        item={item}
+                        index={index}
+                        onSubmitEdit={onSubmitEdit}
+                      />
                     </div>
                   );
                 })
